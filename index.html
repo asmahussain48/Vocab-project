@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Basic page settings -->
+  <meta charset="UTF-8">
+  <!-- Makes the page fit phone screens properly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="An English–Urdu dictionary for learners: simple Urdu, many example sentences, memorize lists and quizzes.">
+  <!-- Colour of the browser bar on phones (app.js changes it in dark mode) -->
+  <meta name="theme-color" content="#ffffff">
+  <title>Lafz – English–Urdu Dictionary</title>
+
+  <!-- Choose light or dark BEFORE the page is drawn, so dark mode never
+       "flashes" white for a moment. (The full theme code is in app.js.) -->
+  <script>
+    (function () {
+      try {
+        var saved = JSON.parse(localStorage.getItem("lafz-vocab-data") || "{}");
+        var theme = saved.settings && saved.settings.theme;
+        if (theme !== "light" && theme !== "dark") {
+          // "auto" (or nothing saved yet): follow the phone/computer setting
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) { /* storage blocked: app.js will set the theme */ }
+    })();
+  </script>
+
+  <!-- App icons: browser tab, phone home screen, and the "install" details -->
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="Lafz">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- Google Fonts: "Noto Nastaliq Urdu" for Urdu and "Nunito" for English.
+       They load in the background (media="print" + onload trick), so the app
+       never waits for Google: it shows at once, and the fonts appear when ready.
+       If you are offline, the browser simply uses a normal font instead. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap"
+        media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap">
+  </noscript>
+
+  <!-- Our own design file -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= TOP BAR =================
+       On a laptop the menu sits at the top.
+       On a phone, style.css moves the menu to the bottom of the screen. -->
+  <header class="topbar">
+    <a href="#/home" class="brand" aria-label="Lafz home">
+      <img src="icons/icon.svg" class="brand-icon" width="30" height="30" alt="">
+      Lafz
+      <span class="brand-urdu" lang="ur" dir="rtl">لفظ</span>
+    </a>
+
+    <!-- Each link changes the "#/..." part of the address.
+         app.js watches that part and shows the right page.
+         data-page tells app.js which link to highlight. -->
+    <nav class="nav" aria-label="Main menu">
+      <a href="#/home" data-page="home"><span class="nav-icon" aria-hidden="true">🏠</span><span class="nav-label">Home</span></a>
+      <a href="#/dictionary" data-page="dictionary"><span class="nav-icon" aria-hidden="true">📖</span><span class="nav-label">Dictionary</span></a>
+      <a href="#/lists" data-page="lists">
+        <span class="nav-icon" aria-hidden="true">📌</span><span class="nav-label">My Lists</span>
+        <!-- app.js puts the number of words to memorize here -->
+        <span class="nav-badge" data-count="memorize" aria-label="words to memorize"></span>
+      </a>
+      <a href="#/quiz" data-page="quiz"><span class="nav-icon" aria-hidden="true">🎯</span><span class="nav-label">Quiz</span></a>
+      <a href="#/settings" data-page="settings"><span class="nav-icon" aria-hidden="true">⚙️</span><span class="nav-label">Settings</span></a>
+    </nav>
+
+    <!-- Quick light/dark switch (app.js changes the icon: 🌙 or ☀️) -->
+    <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch to dark mode" title="Switch light / dark">🌙</button>
+  </header>
+
+  <!-- ================= MAIN AREA =================
+       This is empty on purpose. app.js draws every page
+       (Home, Word List, Quiz ...) inside this <main> element. -->
+  <main id="app" class="container">
+    <noscript>Please turn on JavaScript to use this app.</noscript>
+  </main>
+
+  <!-- ================= CUSTOM POPUP =================
+       Used instead of the browser's plain alert()/confirm().
+       It is hidden until app.js removes the "hidden" class. -->
+  <div id="modal" class="modal-backdrop hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-message">
+      <h2 id="modal-title">Are you sure?</h2>
+      <p id="modal-message"></p>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST =================
+       A small message that pops up for 2–3 seconds, e.g. "Word saved!" -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ================= SCRIPTS =================
+       Order matters: words.js first (the data), then app.js (the logic that uses the data). -->
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

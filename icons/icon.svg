@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Lafz app icon: an open book on a blue rounded square -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5f7dfb"/>
+      <stop offset="1" stop-color="#3a4fd8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- left page -->
+  <path d="M256 160c-40-28-96-36-152-27v236c56-9 112-1 152 27z" fill="#ffffff"/>
+  <!-- right page -->
+  <path d="M256 160c40-28 96-36 152-27v236c-56-9-112-1-152 27z" fill="#e3e9ff"/>
+  <!-- lines of text -->
+  <g stroke="#9fb0f5" stroke-width="12" stroke-linecap="round">
+    <path d="M140 196c30-3 62 1 86 12M140 240c30-3 62 1 86 12M140 284c30-3 62 1 86 12"/>
+    <path d="M372 196c-30-3-62 1-86 12M372 240c-30-3-62 1-86 12M372 284c-30-3-62 1-86 12"/>
+  </g>
+  <!-- the fold in the middle -->
+  <path d="M256 160v236" stroke="#3a4fd8" stroke-width="8" stroke-linecap="round"/>
+</svg>

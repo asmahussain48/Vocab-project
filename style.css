@@ -1,0 +1,1499 @@
+/* ==========================================================
+   style.css — how Lafz looks
+   ----------------------------------------------------------
+   1.  Colours (light and dark theme)
+   2.  Basic page styles
+   3.  Top bar and navigation
+   4.  Reusable pieces (cards, buttons, badges, progress bar)
+   5.  Home page
+   6.  Dictionary (search, A–Z, filters, word rows)
+   7.  📌 Memorize / ✅ Got it buttons
+   8.  Word page and online page
+   9.  My Lists (tabs)
+   10. Flashcards
+   11. Quiz
+   12. Add / Edit word form
+   13. Settings
+   14. Popup (modal) and toast
+   15. Animations
+   16. Phone layout (small screens)
+   ========================================================== */
+
+
+/* ==========================================================
+   1. COLOURS
+   We save colours in "variables" (names that start with --).
+   Then we use them everywhere with var(--name).
+   Dark mode only needs to change these variables!
+   ========================================================== */
+:root {
+  --bg: #f4f6fb;            /* page background */
+  --surface: #ffffff;       /* cards */
+  --surface-2: #eef2f8;     /* soft boxes inside cards */
+  --text: #1e2533;
+  --muted: #5f6b7e;         /* grey text */
+  --border: #e1e6ef;
+  --primary: #4a6cf7;       /* main blue */
+  --primary-hover: #3a5ae0;
+  --primary-soft: #e9eeff;
+  --on-primary: #ffffff;    /* text on a blue button */
+  --success: #138a59;       /* green */
+  --success-soft: #e1f5eb;
+  --danger: #cf3f3f;        /* red */
+  --danger-soft: #fdecec;
+  --on-danger: #ffffff;     /* text on a red button */
+  --warning: #a86a12;       /* orange (used for 📌 Memorize) */
+  --warning-soft: #fdf2df;
+  --mark: #fff0b3;          /* highlighted word in a sentence */
+  --shadow: 0 1px 2px rgba(20, 30, 60, 0.04), 0 6px 20px rgba(20, 30, 60, 0.06);
+  --radius: 18px;
+  --radius-small: 12px;
+  --font-en: "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --font-ur: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Urdu Typesetting", serif;
+  color-scheme: light;
+}
+
+/* Dark theme: app.js puts data-theme="dark" on the <html> tag */
+[data-theme="dark"] {
+  --bg: #11141b;
+  --surface: #1a1f29;
+  --surface-2: #232a36;
+  --text: #e7eaf1;
+  --muted: #a0aabb;
+  --border: #2d3543;
+  --primary: #7d95ff;
+  --primary-hover: #95a9ff;
+  --primary-soft: #252e4a;
+  --on-primary: #0f1424;
+  --success: #45d394;
+  --success-soft: #16352a;
+  --danger: #ff7d7d;
+  --danger-soft: #3b1f23;
+  --on-danger: #2a1012;
+  --warning: #f2b552;
+  --warning-soft: #3a2e17;
+  --mark: #5c4b10;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  color-scheme: dark;
+}
+
+
+/* ==========================================================
+   2. BASIC PAGE STYLES
+   ========================================================== */
+* {
+  box-sizing: border-box; /* width includes padding: easier layouts */
+}
+
+/* On phones: no grey flash when you tap, and no double-tap zoom on buttons */
+* { -webkit-tap-highlight-color: transparent; }
+a, button, select, label { touch-action: manipulation; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-en);
+  font-size: 18px;        /* big, readable English text */
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Smooth theme change: while app.js adds the class "theme-changing"
+   (less than half a second), every colour fades instead of jumping. */
+.theme-changing *,
+.theme-changing *::before,
+.theme-changing *::after {
+  transition: background-color 0.4s ease, border-color 0.4s ease,
+              color 0.4s ease, box-shadow 0.4s ease !important;
+}
+.theme-changing body { transition: background-color 0.4s ease, color 0.4s ease; }
+
+h1 { font-size: 1.8rem; line-height: 1.25; margin: 0 0 0.4em; }
+h2 { font-size: 1.3rem; line-height: 1.3; }
+a  { color: var(--primary); }
+
+/* All Urdu text uses the Nastaliq font.
+   Nastaliq letters are tall, so it needs a big line-height. */
+.urdu {
+  font-family: var(--font-ur);
+  font-size: 1.2em;       /* slightly bigger than English */
+  line-height: 2.2;
+}
+
+/* The centre column that holds every page */
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+mark {
+  background: var(--mark);
+  color: inherit;
+  border-radius: 4px;
+  padding: 0 3px;
+}
+
+/* Small helper classes */
+.muted  { color: var(--muted); }
+.small  { font-size: 0.9rem; }
+.center { text-align: center; }
+.hidden { display: none !important; }
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.section-title { font-size: 1.2rem; margin: 0 0 12px; }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 26px;
+}
+.section-head .section-title { margin-bottom: 4px; }
+.section-head a { white-space: nowrap; }
+
+.page { animation: fadeIn 0.3s ease; }
+
+/* Going from word to word (← →): the page itself does not move,
+   only the cards fade in, so the word bar stays perfectly still. */
+.page.instant { animation: none; }
+.page.instant > .card { animation: fadeOnly 0.25s ease; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.page-header h1 { margin: 0; }
+
+/* Keyboard users see a clear blue outline */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+
+/* ==========================================================
+   3. TOP BAR AND NAVIGATION
+   ========================================================== */
+.topbar {
+  position: sticky;   /* stays at the top when you scroll */
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* env(safe-area-inset-top) = space for the iPhone notch */
+  padding: max(10px, env(safe-area-inset-top)) 24px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+/* 🌙 / ☀️ quick theme button */
+.theme-btn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.theme-btn:active { transform: scale(0.92) rotate(-15deg); }
+@media (hover: hover) { .theme-btn:hover { border-color: var(--primary); } }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand-urdu {
+  font-family: var(--font-ur);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.nav { display: flex; gap: 4px; margin-left: auto; }
+
+.nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+@media (hover: hover) { .nav a:hover  { background: var(--surface-2); color: var(--text); } }
+.nav a.active { background: var(--primary-soft); color: var(--primary); }
+
+/* The small orange number next to "My Lists" */
+.nav-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--warning);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+[data-theme="dark"] .nav-badge { color: #1a1206; }
+.nav-badge[data-zero="true"],
+.nav-badge:empty { display: none; }
+
+
+/* ==========================================================
+   4. REUSABLE PIECES
+   ========================================================== */
+
+/* ---- Cards ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;           /* big enough for a finger */
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
+}
+.btn:active   { transform: scale(0.97); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-primary       { background: var(--primary); color: var(--on-primary); }
+@media (hover: hover) { .btn-primary:hover { background: var(--primary-hover); } }
+
+.btn-ghost       { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+@media (hover: hover) { .btn-ghost:hover { border-color: var(--primary); } }
+
+.btn-danger  { background: var(--danger); color: var(--on-danger); }
+.danger-text { color: var(--danger); }
+
+.btn-small { min-height: 40px; padding: 6px 14px; font-size: 0.95rem; }
+.btn-wide  { width: 100%; }
+
+.button-row        { display: flex; flex-wrap: wrap; gap: 10px; }
+.button-row.center { justify-content: center; }
+
+/* ---- Round speaker button 🔊 ---- */
+.speak-btn {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+@media (hover: hover) { .speak-btn:hover  { transform: scale(1.08); } }
+.speak-btn:active { transform: scale(0.95); }
+.speak-btn.small  { width: 38px; height: 38px; font-size: 1rem; }
+.speak-btn.big    { width: 66px; height: 66px; font-size: 1.8rem; }
+
+/* ---- Badges (easy / medium / hard) ---- */
+.badge {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+.level-easy   { background: var(--success-soft); color: var(--success); }
+.level-medium { background: var(--warning-soft); color: var(--warning); }
+.level-hard   { background: var(--danger-soft);  color: var(--danger); }
+.badge-soft   { background: var(--surface-2);    color: var(--muted); }
+
+/* ---- Progress bar ---- */
+.progress {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  transition: width 0.5s ease;
+}
+
+.score-pill {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 800;
+}
+
+/* ---- A centred message card (e.g. "Nothing to review") ---- */
+.message-card  { text-align: center; padding: 36px 22px; }
+.message-emoji { font-size: 3.2rem; line-height: 1.2; }
+
+/* ---- Form controls ---- */
+input[type="text"],
+input[type="search"],
+select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+}
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* Boxes where you type Urdu */
+.urdu-input {
+  font-family: var(--font-ur);
+  font-size: 1.15rem;
+  line-height: 2;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* ---- Chips (small rounded labels / links) ---- */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.center-chips { justify-content: center; margin-top: 12px; }
+.chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.15s;
+}
+@media (hover: hover) { .chip:hover { transform: translateY(-2px); } }
+.chip-syn { background: var(--success-soft); color: var(--success); }
+.chip-ant { background: var(--danger-soft);  color: var(--danger); }
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ---- Example sentences (used on many pages) ---- */
+.sentence-list { list-style: none; margin: 0; padding: 0; }
+.sentence {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.sentence:last-child { border-bottom: none; }
+.sentence-en {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.sentence-en p { margin: 5px 0 0; font-size: 1.08rem; }
+.sentence-ur   { margin: 2px 0 0; transition: filter 0.25s, opacity 0.25s; }
+
+/* "Hide Urdu" mode: blur the Urdu until you tap it */
+.urdu-hidden .sentence-ur:not(.revealed) {
+  filter: blur(8px);
+  opacity: 0.7;
+  cursor: pointer;
+  user-select: none;
+}
+
+
+/* ==========================================================
+   5. HOME PAGE
+   ========================================================== */
+.hello p { margin: 0 0 16px; }
+
+.home-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.home-search input { flex: 1; }
+
+/* Word of the Day */
+.wotd {
+  background: linear-gradient(135deg, var(--primary-soft), var(--surface) 70%);
+}
+.wotd-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.wotd-word { font-size: 2.3rem; margin: 0; word-break: break-word; }
+.wotd p { margin: 0; }
+.wotd-example {
+  margin-top: 6px;
+  padding: 4px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+}
+.wotd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Big Urdu text (used in several pages) */
+.big-urdu {
+  font-size: 1.7rem;
+  line-height: 2;
+  margin: 4px 0 8px;
+}
+
+/* 4 number boxes */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.stat {
+  padding: 16px 10px;
+  text-align: center;
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+@media (hover: hover) { a.stat:hover { border-color: var(--primary); } }
+.stat-value {
+  display: block;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--primary);
+}
+.stat-label { font-size: 0.9rem; color: var(--muted); }
+
+/* Daily goal box */
+.goal-top {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.goal-text { margin: 10px 0 0; }
+
+/* 4 big buttons */
+.big-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.big-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 140px;
+  padding: 18px 12px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, border-color 0.2s;
+}
+@media (hover: hover) { .big-btn:hover   { transform: translateY(-3px); border-color: var(--primary); } }
+.big-btn strong  { font-size: 1.1rem; line-height: 1.3; }
+.big-icon        { font-size: 2.2rem; line-height: 1.2; }
+.big-sub         { font-size: 0.9rem; color: var(--muted); }
+.big-btn.primary { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+.big-btn.primary .big-sub { color: inherit; opacity: 0.85; }
+
+
+/* ==========================================================
+   6. DICTIONARY
+   ========================================================== */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* A–Z buttons */
+.letter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.letter {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+@media (hover: hover) { .letter:hover { border-color: var(--primary); } }
+.letter.on    { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+
+/* Rounded filter buttons */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.filter-chip {
+  min-height: 40px;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+@media (hover: hover) { .filter-chip:hover:not(:disabled) { border-color: var(--primary); } }
+.filter-chip.on       { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.filter-chip:disabled { opacity: 0.5; cursor: not-allowed; }
+.chip-row select {
+  width: auto;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+}
+
+/* "Search online" box */
+.online-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+/* One dictionary row */
+.dict-list { display: flex; flex-direction: column; gap: 10px; }
+
+.dict-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--border);   /* the coloured stripe shows the status */
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+.dict-row.status-memorize { border-left-color: var(--warning); }
+.dict-row.status-done     { border-left-color: var(--success); }
+
+.dict-row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+}
+
+/* The big clickable part of the row (word + Urdu) */
+.dict-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) auto;
+  grid-template-areas: "word urdu chevron";
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+@media (hover: hover) { .dict-main:hover { background: var(--surface-2); } }
+
+.dict-word-col { grid-area: word; min-width: 0; }
+.dict-word { font-size: 1.15rem; font-weight: 800; word-break: break-word; }
+.dict-pos  { margin-left: 6px; font-size: 0.85rem; color: var(--muted); font-style: italic; }
+.dict-urdu {
+  grid-area: urdu;
+  font-size: 1.12rem;
+  line-height: 2;
+  text-align: right;
+}
+.dict-chevron {
+  grid-area: chevron;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+.dict-row.open .dict-chevron { transform: rotate(180deg); }
+
+.dict-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The part that opens under the row */
+.dict-panel { display: none; }
+.dict-row.open .dict-panel {
+  display: block;
+  padding: 2px 18px 14px;
+  border-top: 1px solid var(--border);
+  animation: fadeIn 0.2s ease;
+}
+.panel-meaning {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 2px;
+}
+.panel-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+
+/* ==========================================================
+   7. 📌 MEMORIZE / ✅ GOT IT BUTTONS
+   ========================================================== */
+.status-btns { display: flex; gap: 6px; }
+
+.status-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 4px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.status-btn:active { transform: scale(0.95); }
+@media (hover: hover) { .status-btn.memo:hover { border-color: var(--warning); } }
+@media (hover: hover) { .status-btn.done:hover { border-color: var(--success); } }
+
+/* "on" = the word IS in that list */
+.status-btn.memo.on { background: var(--warning-soft); border-color: var(--warning); color: var(--warning); }
+.status-btn.done.on { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+.status-btn.on { animation: pop 0.3s ease; }
+
+/* Big version (word page) with Urdu under the English */
+.status-btns.big { gap: 10px; margin: 6px 0 4px; }
+.status-btns.big .status-btn {
+  flex: 1;
+  min-height: 70px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  font-size: 1.05rem;
+}
+.status-ur {
+  font-family: var(--font-ur);
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+
+/* ==========================================================
+   8. WORD PAGE AND ONLINE PAGE
+   ========================================================== */
+.back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+/* The word bar:  ← previous · 📌 Memorize · ✅ Got it · next →
+   "sticky" = it scrolls with the page until it reaches the top bar,
+   then it stays there. So the 4 buttons are always in the same place. */
+.word-bar {
+  position: sticky;
+  top: var(--topbar-height, 64px);
+  z-index: 15;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.word-bar .status-btns.big { flex: 2.4; margin: 0; }
+.keys-hint.word-keys { margin: -8px 0 12px; text-align: center; }
+
+/* ← and → buttons */
+.bar-nav {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 800;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s, transform 0.1s;
+}
+@media (hover: hover) { .bar-nav:hover  { border-color: var(--primary); color: var(--primary); } }
+.bar-nav:active { transform: scale(0.96); }
+.bar-nav.disabled { opacity: 0.35; }
+.bar-arrow { font-size: 1.5rem; line-height: 1.1; }
+.bar-word {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;   /* long words end with "…" */
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.detail-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.detail-word-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.detail-word     { font-size: 2.5rem; margin: 0; word-break: break-word; }
+.detail-top p    { margin: 0; }
+.detail-badges   { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Urdu meaning + English meaning, side by side */
+.meanings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0 8px;
+}
+.meaning-box {
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border-radius: var(--radius-small);
+}
+.meaning-box p:last-child { margin: 0; }
+
+.status-text { margin: 12px 0 6px; font-weight: 700; color: var(--muted); }
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sentences-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.sentences-header .section-title { margin: 0; }
+.hide-hint { margin: 0 0 6px; }
+
+.syn-ant {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+/* Online page */
+.spinner {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 12px;
+  border: 4px solid var(--surface-2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.auto-note {
+  margin: 10px 0;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.online-hint-inline { margin: 8px 0; }
+.online-meanings h3 {
+  margin: 14px 0 4px;
+  font-size: 1.05rem;
+  color: var(--primary);
+  text-transform: capitalize;
+}
+.online-meanings ol { margin: 0; padding-left: 24px; }
+.online-meanings li { margin-bottom: 6px; }
+
+
+/* ==========================================================
+   9. MY LISTS (TABS)
+   ========================================================== */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tab {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+@media (hover: hover) { .tab:hover { border-color: var(--primary); } }
+.tab.on    { background: var(--primary); border-color: transparent; color: var(--on-primary); }
+.tab-count {
+  display: inline-block;
+  min-width: 28px;
+  margin-left: 4px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.18);
+}
+.list-intro p { margin-top: 0; }
+
+
+/* ==========================================================
+   10. FLASHCARDS
+   The card has two faces (front and back) stacked on top of
+   each other. When we add the class "flipped", the card turns
+   180 degrees, so you see the back.
+   ========================================================== */
+.flash-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.flashcard {
+  margin: 18px 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+  perspective: 1200px;    /* gives the 3D effect */
+}
+
+.flashcard-inner {
+  display: grid;            /* both faces sit in the same grid cell */
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+.flash-face {
+  grid-area: 1 / 1;         /* same cell = on top of each other */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 330px;
+  padding: 26px 22px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backface-visibility: hidden;          /* hide the face that is turned away */
+  -webkit-backface-visibility: hidden;
+}
+.flash-back {
+  transform: rotateY(180deg);           /* the back starts turned away */
+  background: linear-gradient(160deg, var(--primary-soft), var(--surface) 65%);
+}
+/* Only the face you can see can be clicked */
+.flashcard:not(.flipped) .flash-back,
+.flashcard.flipped .flash-front { pointer-events: none; }
+
+.flash-word  { font-size: 2.7rem; margin: 0; word-break: break-word; }
+.flash-face > p { margin: 0; }
+.flash-urdu  { font-size: 2rem; line-height: 2; }
+.tap-hint    { margin-top: 6px !important; font-size: 0.9rem; color: var(--muted); }
+
+.flash-sentence {
+  width: 100%;
+  padding: 2px 16px;
+  text-align: start;   /* "start" = left for English, right for Urdu (dir="rtl") */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+}
+
+/* The answer buttons under the card */
+.rate-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.rate-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-small);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.2s;
+}
+@media (hover: hover) { .rate-btn:hover  { border-color: currentColor; } }
+.rate-btn:active { transform: scale(0.96); }
+.rate-btn small  { font-size: 0.82rem; font-weight: 600; opacity: 0.85; }
+.rate-emoji      { font-size: 1.6rem; }
+.rate-again { background: var(--danger-soft);  color: var(--danger); }
+.rate-easy  { background: var(--success-soft); color: var(--success); }
+.keys-hint  { margin: 14px 0 4px; }
+
+/* Phones have no keyboard shortcuts, so hide that hint there */
+@media (hover: none) {
+  .keys-hint { display: none; }
+}
+
+
+/* ==========================================================
+   11. QUIZ
+   ========================================================== */
+.quiz-source { margin-bottom: 8px; }
+
+.quiz-types {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.quiz-type {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 0;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+@media (hover: hover) { .quiz-type:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--primary); } }
+.quiz-type:disabled { opacity: 0.5; cursor: not-allowed; }
+.quiz-type strong   { font-size: 1.15rem; }
+.quiz-icon          { font-size: 2rem; line-height: 1.3; }
+
+.question-card { margin-top: 16px; }
+.q-label  { margin: 0 0 8px; font-weight: 700; color: var(--muted); }
+.q-prompt { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.q-word   { font-size: 2.3rem; margin: 0; word-break: break-word; }
+.q-urdu   { font-size: 2rem; line-height: 2; margin: 0 0 16px; text-align: center; }
+.q-sentence { margin: 0 0 18px; font-size: 1.35rem; font-weight: 600; }
+.blank    { color: var(--primary); letter-spacing: 0.1em; }
+.listen-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
+/* Answer options */
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.option {
+  min-height: 58px;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.option.urdu {
+  font-family: var(--font-ur);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 2.1;
+}
+@media (hover: hover) { .option:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-soft); } }
+.option:disabled { cursor: default; }
+.option:disabled:not(.correct):not(.wrong) { opacity: 0.55; }
+
+/* Green = correct, red = wrong */
+.option.correct {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+  animation: pop 0.4s ease;
+}
+.option.wrong {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger);
+  animation: shake 0.4s ease;
+}
+
+/* Feedback box after you answer */
+.feedback {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-small);
+  animation: fadeIn 0.3s ease;
+}
+.feedback.is-correct { background: var(--success-soft); }
+.feedback.is-wrong   { background: var(--danger-soft); }
+.feedback p          { margin: 4px 0; }
+.feedback-title      { font-size: 1.15rem; font-weight: 800; }
+.is-correct .feedback-title { color: var(--success); }
+.is-wrong .feedback-title   { color: var(--danger); }
+.feedback .sentence-en { margin-top: 8px; }
+
+/* Final score */
+.result-score {
+  font-size: 3.4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--primary);
+}
+.result-message { margin: 8px 0 0; font-size: 1.3rem; font-weight: 700; }
+
+
+/* ==========================================================
+   12. ADD / EDIT WORD FORM
+   ========================================================== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+  margin-bottom: 22px;
+}
+.field       { display: flex; flex-direction: column; gap: 6px; }
+.field.full  { grid-column: 1 / -1; }
+.field label { font-size: 1rem; font-weight: 700; }
+.required    { color: var(--danger); }
+
+.field-error {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--danger);
+}
+.field-error:empty { display: none; }
+
+input.invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+  animation: shake 0.35s ease;
+}
+
+.sentence-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 14px;
+  background: var(--surface-2);
+  border-radius: var(--radius-small);
+  animation: fadeIn 0.25s ease;
+}
+.sentence-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sentence-number { font-size: 0.95rem; font-weight: 800; color: var(--muted); }
+.remove-sentence {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--danger);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+@media (hover: hover) { .remove-sentence:hover { background: var(--danger-soft); } }
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+
+/* ==========================================================
+   13. SETTINGS
+   ========================================================== */
+.settings-group .section-title { margin-bottom: 8px; }
+.settings-group > p { margin: 0 0 14px; }
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.setting-text { display: flex; flex-direction: column; }
+.setting-row select { width: auto; min-width: 150px; }
+
+/* Light / Dark / Auto: three buttons joined together */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.segment {
+  min-height: 46px;
+  padding: 8px 6px;
+  border: none;
+  border-radius: 11px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.segment.on {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.danger-zone { border-color: var(--danger-soft); }
+
+
+/* ==========================================================
+   14. POPUP (MODAL) AND TOAST
+   ========================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;                 /* cover the whole screen */
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 20, 35, 0.55);
+  animation: fadeIn 0.2s ease;
+}
+.modal {
+  width: 100%;
+  max-width: 420px;
+  padding: 26px;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.25s ease;
+}
+.modal h2 { margin: 0 0 8px; }
+.modal p  { margin: 0 0 22px; color: var(--muted); }
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 60;
+  max-width: calc(100% - 32px);
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 20px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+
+/* ==========================================================
+   15. ANIMATIONS
+   ========================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+/* Correct answer / button turned on: grows a little, then back */
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+/* Wrong answer: shakes left and right */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+/* Fade without moving (used when going word → word) */
+@keyframes fadeOnly {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+/* Some people turn off animations in their phone/computer settings */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after,
+  .theme-changing *, .theme-changing *::before, .theme-changing *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==========================================================
+   16. PHONE LAYOUT
+   Everything inside this block only applies when the screen
+   is 820px wide or less.
+   ========================================================== */
+@media (max-width: 820px) {
+  .topbar { padding: max(8px, env(safe-area-inset-top)) 16px 8px; }
+  .theme-btn { margin-left: auto; width: 40px; height: 40px; } /* top-right corner */
+
+  /* Move the menu to the bottom of the screen */
+  .nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    margin-left: 0;
+    justify-content: space-around;
+    gap: 0;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+  }
+  .nav a {
+    flex: 1;
+    flex-direction: column;
+    gap: 0;
+    padding: 6px 2px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  .nav-icon { font-size: 1.35rem; line-height: 1.3; }
+  .nav-badge {
+    position: absolute;
+    top: 2px;
+    left: calc(50% + 6px);
+  }
+
+  /* Leave space at the bottom so the menu does not cover content */
+  .container { padding: 18px 16px 112px; }
+  .toast     { bottom: calc(88px + env(safe-area-inset-bottom)); }
+
+  h1 { font-size: 1.55rem; }
+  .card { padding: 18px; }
+
+  .stats, .big-buttons { grid-template-columns: repeat(2, 1fr); }
+  .big-btn { min-height: 120px; padding: 14px 10px; }
+
+  /* A–Z and the filter buttons: one line each that you swipe sideways.
+     The right edge fades out, to show that there is more. */
+  .letter-bar,
+  .chip-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 2px 30px 4px 0;
+    scrollbar-width: none;        /* no scrollbar (Firefox) */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent);
+  }
+  .letter-bar::-webkit-scrollbar,
+  .chip-row::-webkit-scrollbar { display: none; } /* no scrollbar (Chrome, Safari) */
+  .letter, .chip-row > * { flex-shrink: 0; }
+  .filters { gap: 10px; }
+  /* Inside the filter card, let the lines run to the card's edge */
+  .filters .letter-bar,
+  .filters .chip-row { margin-right: -18px; }
+
+  /* Dictionary rows: 2 lines — word + Urdu on top, buttons below */
+  .dict-row-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 4px;
+  }
+  .dict-row-top { padding: 2px 4px 4px; }
+  .dict-main {
+    /* the English word gets the space it needs (up to 60%), Urdu gets the rest */
+    grid-template-columns: fit-content(60%) minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 4px 10px 0;
+  }
+  .dict-word { font-size: 1.08rem; word-break: normal; }
+  .dict-urdu { font-size: 1.14rem; line-height: 1.85; }
+  .dict-actions {
+    justify-content: space-between;  /* 🔊 on the left, 📌 ✅ on the right */
+    padding: 0 6px 4px 10px;
+  }
+  .dict-row.open .dict-panel { padding: 2px 14px 12px; }
+
+  .meanings, .syn-ant, .form-grid,
+  .options, .quiz-types { grid-template-columns: 1fr; }
+
+  /* Word bar on phones: small ← → buttons, bigger 📌 ✅ buttons */
+  .word-bar { gap: 6px; padding: 6px; }
+  .bar-nav  { flex: 0 0 44px; padding: 6px 2px; }
+  .bar-word { display: none; }
+  .word-bar .status-btn {
+    min-height: 64px;
+    padding: 6px 2px;
+    font-size: 0.85rem;
+  }
+
+  .detail-word { font-size: 2.1rem; }
+  .flash-word  { font-size: 2.3rem; }
+  .flash-face  { min-height: 300px; padding: 22px 14px; }
+
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .wotd-word { font-size: 2rem; }
+  .home-search .btn { padding: 10px 14px; }
+  .status-btn { padding: 4px 10px; }
+  .word-bar .status-btn { white-space: normal; } /* very narrow: let the label wrap */
+}
